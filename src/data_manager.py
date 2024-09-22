@@ -1,7 +1,7 @@
 import pyspark.sql
 from pyspark.ml.feature import StandardScaler, VectorAssembler
 from clickhouse_sqlalchemy import make_session
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 
 class DataManager:
@@ -29,18 +29,17 @@ class DataManager:
         clickhouse_url = f'clickhouse://{self.clickhouse_username}:{self.clickhouse_password}@31.128.42.197:8123/my_db'
         engine = create_engine(clickhouse_url)
         session = make_session(engine)
-
-        df.toPandas().to_sql(dbtable, engine, if_exists='append', index=False)
-
+        session.execute(text('TRUNCATE predictions;'))
+        session.commit()
         session.close()
 
-        # df.write.jdbc(url=self.clickhouse_url, table=dbtable, mode="overwrite",
-        # properties = {
-        #                 "user": self.clickhouse_username,
-        #                 "password": self.clickhouse_password,
-        #                 "driver": "com.clickhouse.jdbc.ClickHouseDriver"
-        #                 }
-        #             )
+        df.write.jdbc(url=self.clickhouse_url, table=dbtable, mode="append",
+        properties = {
+                        "user": self.clickhouse_username,
+                        "password": self.clickhouse_password,
+                        "driver": "com.clickhouse.jdbc.ClickHouseDriver"
+                        }
+                    )
 
         
      
