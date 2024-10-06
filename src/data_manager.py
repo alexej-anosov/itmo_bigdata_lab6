@@ -24,14 +24,7 @@ class DataManager:
             .load()
         
         
-    def overwrtie_data(self, dbtable: str, df: pyspark.sql.DataFrame):
-
-        clickhouse_url = f'clickhouse://{self.clickhouse_username}:{self.clickhouse_password}@31.128.42.197:8123/my_db'
-        engine = create_engine(clickhouse_url)
-        session = make_session(engine)
-        session.execute(text('TRUNCATE predictions;'))
-        session.commit()
-        session.close()
+    def append_data(self, dbtable: str, df: pyspark.sql.DataFrame):
 
         df.write.jdbc(url=self.clickhouse_url, table=dbtable, mode="append",
         properties = {
@@ -40,6 +33,8 @@ class DataManager:
                         "driver": "com.clickhouse.jdbc.ClickHouseDriver"
                         }
                     )
+        
+        
 
         
      

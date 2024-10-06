@@ -62,7 +62,7 @@ if __name__ == '__main__':
     
     logger.info('Model saved')
 
-    data_manager.overwrtie_data('predictions', output.select('code'))
+    data_manager.append_data('predictions', output.select('code'))
 
     logger.info('Predictions saved')
     
